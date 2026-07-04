@@ -1,0 +1,16 @@
+node_modules
+coverage
+logs
+uploads
+
+.env
+.env.*
+!.env.example
+
+*.log
+*.err.log
+*.out.log
+
+.git
+.gitignore
+
