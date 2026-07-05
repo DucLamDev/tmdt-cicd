@@ -40,10 +40,34 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Test backend
+      - name: Test backend (advisory)
         working-directory: backend
-        continue-on-error: ${{ vars.CI_STRICT_BACKEND_TESTS != 'true' }}
-        run: npm test -- --runInBand
+        shell: bash
+        env:
+          CI_STRICT_BACKEND_TESTS: ${{ vars.CI_STRICT_BACKEND_TESTS }}
+        run: |
+          set +e
+          npm test -- --runInBand
+          status=$?
+
+          if [ "$status" -eq 0 ]; then
+            echo "Backend tests passed." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "$CI_STRICT_BACKEND_TESTS" = "true" ]; then
+            echo "::error::Backend tests failed and CI_STRICT_BACKEND_TESTS=true."
+            exit "$status"
+          fi
+
+          echo "::warning::Backend tests failed, but deployment is continuing because CI_STRICT_BACKEND_TESTS is not true."
+          {
+            echo "### Backend tests"
+            echo ""
+            echo "Backend tests failed in advisory mode. Deployment continues."
+            echo "Set repository variable \`CI_STRICT_BACKEND_TESTS=true\` to make this block deployment."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
 
       - name: Setup Node for frontend
         uses: actions/setup-node@v4
@@ -56,10 +80,34 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: Test frontend
+      - name: Test frontend (advisory)
         working-directory: frontend
-        continue-on-error: ${{ vars.CI_STRICT_FRONTEND_TESTS != 'true' }}
-        run: CI=true npm test -- --runInBand
+        shell: bash
+        env:
+          CI_STRICT_FRONTEND_TESTS: ${{ vars.CI_STRICT_FRONTEND_TESTS }}
+        run: |
+          set +e
+          CI=true npm test -- --runInBand
+          status=$?
+
+          if [ "$status" -eq 0 ]; then
+            echo "Frontend tests passed." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "$CI_STRICT_FRONTEND_TESTS" = "true" ]; then
+            echo "::error::Frontend tests failed and CI_STRICT_FRONTEND_TESTS=true."
+            exit "$status"
+          fi
+
+          echo "::warning::Frontend tests failed, but deployment is continuing because CI_STRICT_FRONTEND_TESTS is not true."
+          {
+            echo "### Frontend tests"
+            echo ""
+            echo "Frontend tests failed in advisory mode. Deployment continues."
+            echo "Set repository variable \`CI_STRICT_FRONTEND_TESTS=true\` to make this block deployment."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
 
       - name: Build frontend
         working-directory: frontend
