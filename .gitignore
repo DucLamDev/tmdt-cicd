@@ -4,6 +4,16 @@
 !.env.example
 !.env.*.example
 
+# SSH/deploy keys - never commit these
+github_actions_marketplace
+github_actions_marketplace.pub
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
 # Local agent/editor state
 .agents/
 .codex/

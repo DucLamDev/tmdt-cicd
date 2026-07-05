@@ -103,7 +103,23 @@ cd /opt/marketplace
 
 ## 4. Tạo file `.env` trên VPS
 
-Copy nội dung từ file local `.env.production.example` vào VPS:
+Lưu ý quan trọng: các dòng dạng `APP_DOMAIN=:80`, `FRONTEND_URL=...`, `JWT_ACCESS_SECRET=...` là **nội dung của file `.env`**, không phải lệnh PowerShell/CMD để chạy từng dòng. Nếu paste trực tiếp các dòng đó vào PowerShell, bạn sẽ gặp lỗi kiểu `not recognized as the name of a cmdlet`.
+
+Ở máy Windows local, mở file `.env` bằng Notepad/VS Code rồi chỉnh nội dung trong file:
+
+```powershell
+notepad .env
+```
+
+Sau khi chỉnh xong, upload file `.env` lên VPS:
+
+```powershell
+scp .env USER@103.178.234.101:/opt/marketplace/.env
+```
+
+Thay `USER` bằng user SSH thật của VPS, ví dụ `root` hoặc `ubuntu`.
+
+Hoặc có thể tạo/chỉnh trực tiếp trên VPS:
 
 ```bash
 cd /opt/marketplace
